@@ -32,6 +32,7 @@ public:
 	int life;
 	int damage;
 	int count;
+	inline bool operator< (const OurBoss& rhs) { return this->final_score < rhs.final_score; }
 };
 
 OurBoss::OurBoss(vector<Evolve>& Evolve5Times) {
@@ -53,8 +54,18 @@ OurBoss::OurBoss(vector<Evolve>& Evolve5Times) {
 		}
 	}
 	total_damage = damage;
-	for (int i = 0; i < Evolve5Times.size(); i++)if (Evolve5Times[i].evolveName == "风怒") { total_damage *= 2; break; }
-	for (int i = 0; i < Evolve5Times.size(); i++)if (Evolve5Times[i].evolveName == "潜行") { final_score += 90; break; }
+	for (int i = 0; i < Evolve5Times.size(); i++)if (Evolve5Times[i].evolveName == "风怒") { total_damage *= 2;  break; }
+	for (int i = 0; i < Evolve5Times.size(); i++)if (Evolve5Times[i].evolveName == "潜行") 
+	{ 
+		for (int j = 0; j < Evolve5Times.size(); j++)
+		{
+			if (Evolve5Times[j].evolveName == "魔免")Evolve5Times[j].evolveScore -= 2;
+		}
+		final_score += 90; break; 
+	}
+	final_score += total_damage * 2;
+	final_score += life;
+	for (int i = 0; i < Evolve5Times.size(); i++) { if (Evolve5Times[i].wordbuf)final_score += Evolve5Times[i].evolveScore; }
 	//for (int i = 0; i < Evolve5Times.size(); i++){ final_score += ; break; }
 
 	print_string += to_string(damage) + "/" + to_string(life);
@@ -69,7 +80,7 @@ int main()
 	srand(t);
 	vector<OurBoss> bosses;
 	vector<Evolve> eSet;//Evolve Set
-	for (int cnt = 0; cnt < 100; cnt++) 
+	for (int cnt = 0; cnt < 100000; cnt++) 
 	{
 		eSet.clear();
 		eSet.push_back(Evolve("潜行", 10, 1, true));
@@ -112,16 +123,22 @@ int main()
 			}
 		}
 		if (!found)bosses.push_back(boss);
-	}
+	}/*
 	
 	for (int i = 0; i < bosses.size(); i++)
 	{
 		cout << bosses[i].combined_string << endl;
 	}
-
+*/
+	sort(bosses.begin(), bosses.end());
+	int total_ct = 0;
 	for (int i = 0; i < bosses.size(); i++)
 	{
-		cout << bosses[i].print_string << endl;
+		total_ct += bosses[i].count;
+	}
+	for (int i = 0; i < bosses.size(); i++)
+	{
+		cout << bosses[i].print_string << " "<<(float)bosses[i].count / (float)total_ct * 100 <<"%"<<endl;
 	}
 	cin >> eSet[0].evolveName;
 }
